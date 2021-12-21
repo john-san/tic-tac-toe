@@ -1,0 +1,53 @@
+h1 {
+  text-align: center;
+}
+.container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+#gameBoard {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 375px;
+  max-height: 375px;
+}
+
+.cell {
+  flex-basis: 33.33%;
+  height: 125px;
+  border: 1px solid black;
+  box-sizing: border-box;
+  font-size: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (min-width: 768px) {
+  .container {
+    width: 80%;
+  }
+  #gameBoard {
+    max-width: 450px;
+    max-height: 450px;
+  }
+  .cell {
+    height: 150px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .container {
+    width: 70%;
+  }
+  #gameBoard {
+    max-width: 525px;
+    max-height: 525px;
+  }
+  .cell {
+    height: 175px;
+  }
+}
