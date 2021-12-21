@@ -2,6 +2,16 @@
 // has array inside gameboard
 const gameBoard = (() => {
   const _gb = new Array(9);
+  const _winConditions = {
+    row1: [0,1,2],
+    row2: [3,4,5],
+    row3: [6,7,8],
+    col1: [0,3,6],
+    col2: [1,4,7],
+    col3: [2,5,8],
+    diag1: [0,4,8],
+    diag2: [2,4,6]
+  }
 
   const showBoard = () => {
     console.log(_gb);
@@ -13,18 +23,36 @@ const gameBoard = (() => {
       _gb[spot] = sign;
       displayController.mark(spot, sign); 
       showBoard();
+      checkForWin();
       game.swapTurns();
     } else {
       alert("spot is filled already!");
     }
     
-
   }
 
+  const checkForWin = () => {
+    const players = game.getPlayers();
+
+    for (const playerNumber in players) {
+      const sign = players[playerNumber].getSign();
+      function doesIdxMatchSign(idx) {
+        return _gb[idx] == sign;
+      }
+      for (const key in _winConditions) {
+        if (_winConditions[key].every(doesIdxMatchSign)) {
+          alert(`${players[playerNumber].getName()} wins!`);
+          game.endGame();
+        }
+      }
+    };
+
+  }
   return {
     showBoard,
     getBoard,
-    mark
+    mark,
+    checkForWin
   }
 })();
 
@@ -32,17 +60,18 @@ const gameBoard = (() => {
 const displayController = (() => {
   const renderBoard = (arr) => {
     const gbDiv = document.getElementById('gameBoard');
-
     for (let i = 0; i < arr.length; i++) {  
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.setAttribute('data-attribute', i);
 
       cell.addEventListener('click', (e) => {
-        const spot = parseInt(e.target.getAttribute('data-attribute'));
-        gameBoard.mark(spot, game.getCurrentPlayerSign());
+        if (!game.isGameOver()) {
+          const spot = parseInt(e.target.getAttribute('data-attribute'));
+          gameBoard.mark(spot, game.getCurrentPlayerSign());
+        }
       })
-
+      gbDiv.appendChild(cell);
     }
   }
 
@@ -76,38 +105,43 @@ const Player = (name, sign) => {
 
 // game module
 const game = (() => {
-  let players = {};
-  let turn;
+  let _players = {};
+  let _turn;
+  let _gameOver = false;
   const setPlayers = (playerOne, playerTwo) => {
-    players = {
+    _players = {
       1: playerOne,
       2: playerTwo
     }
   }
-  const getPlayers = () => players;
+  const getPlayers = () => _players;
   const setPlayerTurn = (playerNumber = 1) => {
     if (playerNumber == 1) {
-      turn = 1;
-      console.log(`${players[1].getName()}'s turn`);
+      _turn = 1;
+      console.log(`${_players[1].getName()}'s turn`);
     } else if (playerNumber == 2) {
-      turn = 2;
-      console.log(`${players[2].getName()}'s turn`);
+      _turn = 2;
+      console.log(`${_players[2].getName()}'s turn`);
     }
   }
 
   const swapTurns = () => {
-    turn == 1 ? setPlayerTurn(2) : setPlayerTurn(1);
+    _turn == 1 ? setPlayerTurn(2) : setPlayerTurn(1);
   }
 
-  const getCurrentPlayerSign = () => players[turn].getSign();
-  
+  const getCurrentPlayerSign = () => _players[_turn].getSign();
+
+  const isGameOver = () => _gameOver;
+  const endGame = () => _gameOver = true;
 
   return {
     setPlayers,
     getPlayers,
     setPlayerTurn,
     swapTurns,
-    getCurrentPlayerSign
+    getCurrentPlayerSign,
+    isGameOver,
+    endGame
   }
 })();
 
@@ -116,3 +150,4 @@ const playerTwo = Player('Player two', 'O');
 game.setPlayers(playerOne, playerTwo);
 game.setPlayerTurn(1);
 displayController.renderBoard(gameBoard.getBoard());
+
