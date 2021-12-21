@@ -18,6 +18,7 @@ const gameBoard = (() => {
       alert("spot is filled already!");
     }
     
+
   }
 
   return {
@@ -31,6 +32,7 @@ const gameBoard = (() => {
 const displayController = (() => {
   const renderBoard = (arr) => {
     const gbDiv = document.getElementById('gameBoard');
+
     for (let i = 0; i < arr.length; i++) {  
       const cell = document.createElement('div');
       cell.classList.add('cell');
@@ -40,7 +42,7 @@ const displayController = (() => {
         const spot = parseInt(e.target.getAttribute('data-attribute'));
         gameBoard.mark(spot, game.getCurrentPlayerSign());
       })
-      gbDiv.appendChild(cell);
+
     }
   }
 
