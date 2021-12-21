@@ -4,6 +4,7 @@ h1 {
 .container {
   width: 90%;
   margin: 0 auto;
+  text-align: center;
 }
 
 #gameBoard {
@@ -24,6 +25,10 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#newGameBtn {
+  margin-bottom: 15px;
 }
 
 @media screen and (min-width: 768px) {

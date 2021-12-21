@@ -1,7 +1,7 @@
 // gameBoard module
 // has array inside gameboard
 const gameBoard = (() => {
-  const _gb = new Array(9);
+  let _gb = new Array(9);
   const _winConditions = {
     row1: [0,1,2],
     row2: [3,4,5],
@@ -23,12 +23,12 @@ const gameBoard = (() => {
       _gb[spot] = sign;
       displayController.mark(spot, sign); 
       showBoard();
-      checkForWin();
       game.swapTurns();
     } else {
       alert("spot is filled already!");
     }
-    
+
+    checkForWin();
   }
 
   const checkForWin = () => {
@@ -48,11 +48,14 @@ const gameBoard = (() => {
     };
 
   }
+
+  const resetBoard = () => _gb = new Array(9);
   return {
     showBoard,
     getBoard,
     mark,
-    checkForWin
+    checkForWin,
+    resetBoard
   }
 })();
 
@@ -60,6 +63,8 @@ const gameBoard = (() => {
 const displayController = (() => {
   const renderBoard = (arr) => {
     const gbDiv = document.getElementById('gameBoard');
+    if (gbDiv.children) gbDiv.replaceChildren();
+
     for (let i = 0; i < arr.length; i++) {  
       const cell = document.createElement('div');
       cell.classList.add('cell');
@@ -134,6 +139,14 @@ const game = (() => {
   const isGameOver = () => _gameOver;
   const endGame = () => _gameOver = true;
 
+  const newGame = () => {
+    console.log('New game!');
+    _gameOver = false;
+    gameBoard.resetBoard();
+    game.setPlayerTurn(1);
+    displayController.renderBoard(gameBoard.getBoard());
+  }
+
   return {
     setPlayers,
     getPlayers,
@@ -141,13 +154,15 @@ const game = (() => {
     swapTurns,
     getCurrentPlayerSign,
     isGameOver,
-    endGame
+    endGame,
+    newGame
   }
 })();
 
 const playerOne = Player('Player one', 'X');
 const playerTwo = Player('Player two', 'O');
 game.setPlayers(playerOne, playerTwo);
-game.setPlayerTurn(1);
-displayController.renderBoard(gameBoard.getBoard());
+game.newGame();
 
+const newGameBtn = document.getElementById('newGameBtn');
+newGameBtn.addEventListener('click', game.newGame);
