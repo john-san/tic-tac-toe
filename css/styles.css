@@ -25,15 +25,21 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 #newGameBtn {
   margin-top: 15px;
   margin-bottom: 0;
+  cursor: pointer;
 }
 
 .hidden {
   display: none;
+}
+
+.scoreboard {
+  margin-bottom: 15px;
 }
 
 @media screen and (min-width: 768px) {

@@ -55,8 +55,8 @@ const displayController = (() => {
   }
 
   const updateNames = (playerOne, playerTwo) => {
-    document.getElementById('playerOneName').textContent = playerOne.getName();
-    document.getElementById('playerTwoName').textContent = playerTwo.getName();
+    document.getElementById('playerOneName').textContent = `${playerOne.getName()} (${playerOne.getSign()})`;
+    document.getElementById('playerTwoName').textContent = `${playerTwo.getName()} (${playerTwo.getSign()})`;
   }
 
   const updateWins = (playerOne, playerTwo) => {
@@ -69,16 +69,13 @@ const displayController = (() => {
     chosen.textContent = sign;
   }
 
-  const _winMsg = document.getElementById('winMsg');
+  const _gameMsg = document.getElementById('gameMsg');
 
-  const hideWinMsg = () => _winMsg.classList.add('hidden');
-  const updateWinMsg = (playerNumber) => {
-    if (playerNumber == 0) {
-      _winMsg.textContent = "It's a tie!";
-    } else {
-      _winMsg.textContent = `${game.getPlayers()[playerNumber].getName()} wins!!`;
-    }
-    _winMsg.classList.remove('hidden');
+  const hideGameMsg = () => _gameMsg.classList.add('hidden');
+  const updateGameMsg = (message) => {
+    _gameMsg.textContent = message;
+    if ([..._gameMsg.classList].includes('hidden')) _gameMsg.classList.remove('hidden');
+      
   }
 
   return {
@@ -86,8 +83,8 @@ const displayController = (() => {
    updateNames,
    updateWins,
    mark,
-   updateWinMsg,
-   hideWinMsg
+   updateGameMsg,
+   hideGameMsg
   }
 })();
 
@@ -138,13 +135,8 @@ const game = (() => {
   }
   const getPlayers = () => _players;
   const setPlayerTurn = (playerNumber = 1) => {
-    if (playerNumber == 1) {
-      _turn = 1;
-      console.log(`${_players[1].getName()}'s turn`);
-    } else if (playerNumber == 2) {
-      _turn = 2;
-      console.log(`${_players[2].getName()}'s turn`);
-    }
+    _turn = playerNumber;
+    displayController.updateGameMsg(`${_players[playerNumber].getName()}'s turn`);
   }
 
   const swapTurns = () => {
@@ -165,7 +157,7 @@ const game = (() => {
         if (_winConditions[key].every(doesIdxMatchSign)) {
           players[playerNumber].incrementWins();
           displayController.updateWins(playerOne, playerTwo);
-          displayController.updateWinMsg(playerNumber);
+          displayController.updateGameMsg(`${game.getPlayers()[playerNumber].getName()} wins!`);
           game.endGame();
           return true;
         }
@@ -174,7 +166,7 @@ const game = (() => {
 
     const isItFilled = (item) => Boolean(item) == true;
     if (gb.filter(isItFilled).length == 9) {
-      displayController.updateWinMsg(0);
+      displayController.updateGameMsg("It's a tie!");
       game.endGame();
     }
   }
@@ -183,13 +175,12 @@ const game = (() => {
   const endGame = () => _gameOver = true;
 
   const newGame = () => {
-    console.log('New game!');
     _gameOver = false;
     gameBoard.resetBoard();
     game.setPlayerTurn(1);
     displayController.renderBoard(gameBoard.getBoard());
     displayController.updateNames(playerOne, playerTwo);
-    displayController.hideWinMsg();
+    displayController.updateGameMsg('New game started.');
   }
 
   return {
