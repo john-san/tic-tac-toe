@@ -69,11 +69,21 @@ const displayController = (() => {
     chosen.textContent = sign;
   }
 
+  const _winMsg = document.getElementById('winMsg');
+
+  const hideWinMsg = () => _winMsg.classList.add('hidden');
+  const updateWinMsg = (playerNumber) => {
+    _winMsg.classList.remove('hidden');
+    _winMsg.textContent = `${game.getPlayers()[playerNumber].getName()} wins! Congratulations!!`;
+  }
+
   return {
    renderBoard,
    updateNames,
    updateWins,
-   mark
+   mark,
+   updateWinMsg,
+   hideWinMsg
   }
 })();
 
@@ -149,9 +159,9 @@ const game = (() => {
       }
       for (const key in _winConditions) {
         if (_winConditions[key].every(doesIdxMatchSign)) {
-          alert(`${players[playerNumber].getName()} wins!`);
           players[playerNumber].incrementWins();
           displayController.updateWins(playerOne, playerTwo);
+          displayController.updateWinMsg(playerNumber);
           game.endGame();
         }
       }
@@ -169,6 +179,7 @@ const game = (() => {
     game.setPlayerTurn(1);
     displayController.renderBoard(gameBoard.getBoard());
     displayController.updateNames(playerOne, playerTwo);
+    displayController.hideWinMsg();
   }
 
   return {
