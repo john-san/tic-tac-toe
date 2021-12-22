@@ -2,16 +2,7 @@
 // has array inside gameboard
 const gameBoard = (() => {
   let _gb = new Array(9);
-  const _winConditions = {
-    row1: [0,1,2],
-    row2: [3,4,5],
-    row3: [6,7,8],
-    col1: [0,3,6],
-    col2: [1,4,7],
-    col3: [2,5,8],
-    diag1: [0,4,8],
-    diag2: [2,4,6]
-  }
+  
 
   const showBoard = () => {
     console.log(_gb);
@@ -28,33 +19,16 @@ const gameBoard = (() => {
       alert("spot is filled already!");
     }
 
-    checkForWin();
+    game.checkForWin();
   }
 
-  const checkForWin = () => {
-    const players = game.getPlayers();
-
-    for (const playerNumber in players) {
-      const sign = players[playerNumber].getSign();
-      function doesIdxMatchSign(idx) {
-        return _gb[idx] == sign;
-      }
-      for (const key in _winConditions) {
-        if (_winConditions[key].every(doesIdxMatchSign)) {
-          alert(`${players[playerNumber].getName()} wins!`);
-          game.endGame();
-        }
-      }
-    };
-
-  }
+  
 
   const resetBoard = () => _gb = new Array(9);
   return {
     showBoard,
     getBoard,
     mark,
-    checkForWin,
     resetBoard
   }
 })();
@@ -80,6 +54,16 @@ const displayController = (() => {
     }
   }
 
+  const updateNames = (playerOne, playerTwo) => {
+    document.getElementById('playerOneName').textContent = playerOne.getName();
+    document.getElementById('playerTwoName').textContent = playerTwo.getName();
+  }
+
+  const updateWins = (playerOne, playerTwo) => {
+    document.getElementById('playerOneWins').textContent = playerOne.getWins();
+    document.getElementById('playerTwoWins').textContent = playerTwo.getWins();
+  }
+
   const mark = (spot, sign) => {
     const chosen = document.querySelector(`[data-attribute="${spot}"]`);
     chosen.textContent = sign;
@@ -87,6 +71,8 @@ const displayController = (() => {
 
   return {
    renderBoard,
+   updateNames,
+   updateWins,
    mark
   }
 })();
@@ -95,15 +81,21 @@ const displayController = (() => {
 const Player = (name, sign) => {
   const _name = name;
   const _sign = sign;
+  let _wins = 0;
   const getName = () => _name;
   const getSign = () => _sign;
   const mark = (spot) => {
     gameBoard.mark(spot, _sign);
   }
 
+  const getWins = () => _wins;
+  const incrementWins = () => _wins += 1;
+
   return {
     getName,
     getSign,
+    getWins,
+    incrementWins,
     mark
   }
 }
@@ -113,6 +105,17 @@ const game = (() => {
   let _players = {};
   let _turn;
   let _gameOver = false;
+  const _winConditions = {
+    row1: [0,1,2],
+    row2: [3,4,5],
+    row3: [6,7,8],
+    col1: [0,3,6],
+    col2: [1,4,7],
+    col3: [2,5,8],
+    diag1: [0,4,8],
+    diag2: [2,4,6]
+  };
+
   const setPlayers = (playerOne, playerTwo) => {
     _players = {
       1: playerOne,
@@ -136,6 +139,26 @@ const game = (() => {
 
   const getCurrentPlayerSign = () => _players[_turn].getSign();
 
+  const checkForWin = () => {
+    const players = game.getPlayers();
+    const gb = gameBoard.getBoard();
+    for (const playerNumber in players) {
+      const sign = players[playerNumber].getSign();
+      function doesIdxMatchSign(idx) {
+        return gb[idx] == sign;
+      }
+      for (const key in _winConditions) {
+        if (_winConditions[key].every(doesIdxMatchSign)) {
+          alert(`${players[playerNumber].getName()} wins!`);
+          players[playerNumber].incrementWins();
+          displayController.updateWins(playerOne, playerTwo);
+          game.endGame();
+        }
+      }
+    };
+
+  }
+
   const isGameOver = () => _gameOver;
   const endGame = () => _gameOver = true;
 
@@ -145,6 +168,7 @@ const game = (() => {
     gameBoard.resetBoard();
     game.setPlayerTurn(1);
     displayController.renderBoard(gameBoard.getBoard());
+    displayController.updateNames(playerOne, playerTwo);
   }
 
   return {
@@ -154,8 +178,9 @@ const game = (() => {
     swapTurns,
     getCurrentPlayerSign,
     isGameOver,
+    checkForWin,
     endGame,
-    newGame
+    newGame,
   }
 })();
 
