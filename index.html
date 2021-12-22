@@ -11,16 +11,27 @@
 <body>
   <h1>Tic-tac-toe</h1>
   <div class='container'>
-    
-    <div class='scoreboard'>
+    <div class="gameOptions">
+      <button id="AIBotBtn">AI Bot</button>
+      <button id="twoPlayersBtn">Two Players</button>
+    </div>
+
+    <div id="gameArea" class="hidden">
+      <div class='scoreboard'>
       <span id="playerOneName"></span> : <span id="playerOneWins">0</span> wins
       |
       <span id="playerTwoName"></span> : <span id="playerTwoWins">0</span> wins
+      </div>
+
+      <div id='gameBoard'>
+      </div>
+      
+      
+      <button id="newGameBtn">New Game</button>
+      <h3 id='gameMsg' class='hidden'></h3>
     </div>
-    <div id='gameBoard'>
-    </div>
-    <button id="newGameBtn">New Game</button>
-    <h3 id='gameMsg' class='hidden'></h3>
+    
+    
   </div>
 </body>
 </html>

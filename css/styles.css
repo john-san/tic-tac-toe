@@ -31,6 +31,9 @@ h1 {
 #newGameBtn {
   margin-top: 15px;
   margin-bottom: 0;
+}
+
+button {
   cursor: pointer;
 }
 
@@ -41,6 +44,11 @@ h1 {
 .scoreboard {
   margin-bottom: 15px;
 }
+
+.gameOptions {
+  margin-bottom: 15px;;
+}
+
 
 @media screen and (min-width: 768px) {
   .container {

@@ -54,12 +54,16 @@ const displayController = (() => {
     }
   }
 
-  const updateNames = (playerOne, playerTwo) => {
+  const updateNames = () => {
+    const playerOne = game.getPlayerOne();
+    const playerTwo = game.getPlayerTwo();
     document.getElementById('playerOneName').textContent = `${playerOne.getName()} (${playerOne.getSign()})`;
     document.getElementById('playerTwoName').textContent = `${playerTwo.getName()} (${playerTwo.getSign()})`;
   }
 
-  const updateWins = (playerOne, playerTwo) => {
+  const updateWins = () => {
+    const playerOne = game.getPlayerOne();
+    const playerTwo = game.getPlayerTwo();
     document.getElementById('playerOneWins').textContent = playerOne.getWins();
     document.getElementById('playerTwoWins').textContent = playerTwo.getWins();
   }
@@ -78,13 +82,18 @@ const displayController = (() => {
       
   }
 
+  const hideItem = (query) => document.querySelector(query).classList.add('hidden');
+  const showItem = (query) => document.querySelector(query).classList.remove('hidden');
+
   return {
    renderBoard,
    updateNames,
    updateWins,
    mark,
    updateGameMsg,
-   hideGameMsg
+   hideGameMsg,
+   hideItem,
+   showItem
   }
 })();
 
@@ -134,6 +143,15 @@ const game = (() => {
     }
   }
   const getPlayers = () => _players;
+  const getPlayerOne = () => _players[1];
+  const getPlayerTwo = () => _players[2];
+  const getXPlayerNumber = () => {
+    for (const playerNumber in _players) {
+      if (_players[playerNumber].getSign() == 'X') {
+        return playerNumber;
+      }
+    }
+  }
   const setPlayerTurn = (playerNumber = 1) => {
     _turn = playerNumber;
     displayController.updateGameMsg(`${_players[playerNumber].getName()}'s turn`);
@@ -147,6 +165,9 @@ const game = (() => {
 
   const checkForWin = () => {
     const players = game.getPlayers();
+    const playerOne = game.getPlayerOne();
+    const playerTwo = game.getPlayerTwo();
+
     const gb = gameBoard.getBoard();
     for (const playerNumber in players) {
       const sign = players[playerNumber].getSign();
@@ -177,15 +198,18 @@ const game = (() => {
   const newGame = () => {
     _gameOver = false;
     gameBoard.resetBoard();
-    game.setPlayerTurn(1);
+    game.setPlayerTurn(getXPlayerNumber());
     displayController.renderBoard(gameBoard.getBoard());
-    displayController.updateNames(playerOne, playerTwo);
+    displayController.updateNames();
+    displayController.updateWins();
     displayController.updateGameMsg('New game started.');
   }
 
   return {
     setPlayers,
     getPlayers,
+    getPlayerOne,
+    getPlayerTwo,
     setPlayerTurn,
     swapTurns,
     getCurrentPlayerSign,
@@ -196,10 +220,117 @@ const game = (() => {
   }
 })();
 
-const playerOne = Player('Player one', 'X');
-const playerTwo = Player('Player two', 'O');
-game.setPlayers(playerOne, playerTwo);
-game.newGame();
+
+
+
+/* twoPlayersBtn */
+const twoPlayersBtn = document.getElementById('twoPlayersBtn');
+twoPlayersBtn.addEventListener('click', (e) => {
+  if (![...document.querySelector('#gameArea').classList].includes('hidden'))
+ {
+   displayController.hideItem('#gameArea');
+ }
+
+  // Helpers 
+  const setAttributes = (el, object) => {
+    for (const attr in object) {
+      el.setAttribute(attr, object[attr])
+    }
+  }
+  const br = () => document.createElement('br');
+  const appendChildren = (parentEl, ...childEls) => {
+    childEls.forEach(child => parentEl.appendChild(child));
+  }
+
+  if (!document.querySelector('form')) {
+    // add form to dom
+    const form = document.createElement('form');
+    const playerOneLabel = document.createElement('label');
+    playerOneLabel.setAttribute('for', 'playerOneName');
+    playerOneLabel.textContent = 'Player 1';
+    const playerOneInput = document.createElement('input');
+    setAttributes(playerOneInput, {
+      'type': 'text',
+      'id': 'playerOneName',
+      'name': 'playerOneName',
+      'placeholder': 'Enter Name',
+      'autocomplete': 'off',
+      'required' : ''
+    });
+
+
+    function swapSign(e) {
+      e.preventDefault();
+      if (playerOneSign.textContent == 'X') {
+        playerOneSign.textContent = 'O';
+        playerTwoSign.textContent = 'X';
+      } else {
+        playerOneSign.textContent = 'X';
+        playerTwoSign.textContent = 'O';
+      }
+    }
+    const playerOneSign = document.createElement('button');
+    playerOneSign.textContent = 'X';
+    playerOneSign.addEventListener('click', swapSign);
+
+    const playerTwoLabel = document.createElement('label');
+    playerTwoLabel.setAttribute('for', 'playerTwoName');
+    playerTwoLabel.textContent = 'Player 2';
+    const playerTwoInput = document.createElement('input');
+    setAttributes(playerTwoInput, {
+      'type': 'text',
+      'id': 'playerTwoName',
+      'name': 'playerTwoName',
+      'placeholder': 'Enter Name',
+      'autocomplete': 'off',
+      'required' : ''
+    });
+    
+    const playerTwoSign = document.createElement('button');
+    playerTwoSign.textContent = 'O';
+    playerTwoSign.addEventListener('click', swapSign)
+
+
+    const submitBtn = document.createElement('input');
+    setAttributes(submitBtn, {
+      'type': 'submit',
+      'value': 'Submit'
+    });
+
+    
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log(e);
+      console.log('submitted');
+      // form hides
+      displayController.hideItem('form');
+      displayController.showItem('#gameArea');
+      // game starts and is shown
+      const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
+      const playerTwo = Player(playerTwoInput.value, playerTwoSign.textContent);
+      game.setPlayers(playerOne, playerTwo);
+      game.newGame();
+      // destroy form
+      form.remove();
+    })
+    
+    appendChildren(form, 
+      playerOneLabel, 
+      playerOneInput, 
+      playerOneSign, 
+      br(), 
+      playerTwoLabel, 
+      playerTwoInput,
+      playerTwoSign,
+      br(), 
+      submitBtn
+    );
+
+    document.querySelector('.container').appendChild(form);
+  }
+  
+
+})
 
 const newGameBtn = document.getElementById('newGameBtn');
 newGameBtn.addEventListener('click', game.newGame);
