@@ -16,7 +16,7 @@ const gameBoard = (() => {
       showBoard();
       game.swapTurns();
     } else {
-      alert("spot is filled already!");
+      // alert("spot is filled already!");
     }
 
     game.checkForWin();
@@ -73,8 +73,12 @@ const displayController = (() => {
 
   const hideWinMsg = () => _winMsg.classList.add('hidden');
   const updateWinMsg = (playerNumber) => {
+    if (playerNumber == 0) {
+      _winMsg.textContent = "It's a tie!";
+    } else {
+      _winMsg.textContent = `${game.getPlayers()[playerNumber].getName()} wins!!`;
+    }
     _winMsg.classList.remove('hidden');
-    _winMsg.textContent = `${game.getPlayers()[playerNumber].getName()} wins! Congratulations!!`;
   }
 
   return {
@@ -163,10 +167,16 @@ const game = (() => {
           displayController.updateWins(playerOne, playerTwo);
           displayController.updateWinMsg(playerNumber);
           game.endGame();
+          return true;
         }
       }
     };
 
+    const isItFilled = (item) => Boolean(item) == true;
+    if (gb.filter(isItFilled).length == 9) {
+      displayController.updateWinMsg(0);
+      game.endGame();
+    }
   }
 
   const isGameOver = () => _gameOver;

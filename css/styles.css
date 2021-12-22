@@ -28,7 +28,8 @@ h1 {
 }
 
 #newGameBtn {
-  margin-bottom: 15px;
+  margin-top: 15px;
+  margin-bottom: 0;
 }
 
 .hidden {
