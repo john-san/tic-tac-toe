@@ -1,336 +1,465 @@
 // gameBoard module
 // has array inside gameboard
 const gameBoard = (() => {
-  let _gb = new Array(9);
-  
+	let _gb = new Array(9);
 
-  const showBoard = () => {
-    console.log(_gb);
-  }
-  const getBoard = () => _gb;
+	const showBoard = () => {
+		console.log(_gb);
+	};
+	const getBoard = () => _gb;
 
-  const mark = (spot, sign) => {
-    if (_gb[spot] == undefined) {
-      _gb[spot] = sign;
-      displayController.mark(spot, sign); 
-      showBoard();
-      game.swapTurns();
-    } else {
-      // alert("spot is filled already!");
-    }
+	const mark = (spot, sign) => {
+		if (_gb[spot] == undefined) {
+			_gb[spot] = sign;
+			displayController.mark(spot, sign);
+			game.swapTurns();
+			game.AIMove();
+		} else {
+			// alert("spot is filled already!");
+		}
 
-    game.checkForWin();
-  }
+		game.checkForWin();
+	};
 
-  
-
-  const resetBoard = () => _gb = new Array(9);
-  return {
-    showBoard,
-    getBoard,
-    mark,
-    resetBoard
-  }
+	const resetBoard = () => (_gb = new Array(9));
+	return {
+		showBoard,
+		getBoard,
+		mark,
+		resetBoard,
+	};
 })();
 
 // displayController module
 const displayController = (() => {
-  const renderBoard = (arr) => {
-    const gbDiv = document.getElementById('gameBoard');
-    if (gbDiv.children) gbDiv.replaceChildren();
+	const renderBoard = (arr) => {
+		const gbDiv = document.getElementById('gameBoard');
+		if (gbDiv.children) gbDiv.replaceChildren();
 
-    for (let i = 0; i < arr.length; i++) {  
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      cell.setAttribute('data-attribute', i);
+		for (let i = 0; i < arr.length; i++) {
+			const cell = document.createElement('div');
+			cell.classList.add('cell');
+			cell.setAttribute('data-attribute', i);
 
-      cell.addEventListener('click', (e) => {
-        if (!game.isGameOver()) {
-          const spot = parseInt(e.target.getAttribute('data-attribute'));
-          gameBoard.mark(spot, game.getCurrentPlayerSign());
-        }
-      })
-      gbDiv.appendChild(cell);
-    }
-  }
+			cell.addEventListener('click', (e) => {
+				if (!game.isGameOver()) {
+					const spot = parseInt(e.target.getAttribute('data-attribute'));
+					gameBoard.mark(spot, game.getCurrentPlayerSign());
+				}
+			});
+			gbDiv.appendChild(cell);
+		}
+	};
 
-  const updateNames = () => {
-    const playerOne = game.getPlayerOne();
-    const playerTwo = game.getPlayerTwo();
-    document.getElementById('playerOneName').textContent = `${playerOne.getName()} (${playerOne.getSign()})`;
-    document.getElementById('playerTwoName').textContent = `${playerTwo.getName()} (${playerTwo.getSign()})`;
-  }
+	const updateNames = () => {
+		const playerOne = game.getPlayerOne();
+		const playerTwo = game.getPlayerTwo();
+		document.getElementById(
+			'playerOneName'
+		).textContent = `${playerOne.getName()} (${playerOne.getSign()})`;
+		document.getElementById(
+			'playerTwoName'
+		).textContent = `${playerTwo.getName()} (${playerTwo.getSign()})`;
+	};
 
-  const updateWins = () => {
-    const playerOne = game.getPlayerOne();
-    const playerTwo = game.getPlayerTwo();
-    document.getElementById('playerOneWins').textContent = playerOne.getWins();
-    document.getElementById('playerTwoWins').textContent = playerTwo.getWins();
-  }
+	const updateWins = () => {
+		const playerOne = game.getPlayerOne();
+		const playerTwo = game.getPlayerTwo();
+		document.getElementById('playerOneWins').textContent = playerOne.getWins();
+		document.getElementById('playerTwoWins').textContent = playerTwo.getWins();
+	};
 
-  const mark = (spot, sign) => {
-    const chosen = document.querySelector(`[data-attribute="${spot}"]`);
-    chosen.textContent = sign;
-  }
+	const mark = (spot, sign) => {
+		const chosen = document.querySelector(`[data-attribute="${spot}"]`);
+		chosen.textContent = sign;
+	};
 
-  const _gameMsg = document.getElementById('gameMsg');
+	const _gameMsg = document.getElementById('gameMsg');
 
-  const hideGameMsg = () => _gameMsg.classList.add('hidden');
-  const updateGameMsg = (message) => {
-    _gameMsg.textContent = message;
-    if ([..._gameMsg.classList].includes('hidden')) _gameMsg.classList.remove('hidden');
-      
-  }
+	const hideGameMsg = () => _gameMsg.classList.add('hidden');
+	const updateGameMsg = (message) => {
+		_gameMsg.textContent = message;
+		if ([..._gameMsg.classList].includes('hidden'))
+			_gameMsg.classList.remove('hidden');
+	};
 
-  const hideItem = (query) => document.querySelector(query).classList.add('hidden');
-  const showItem = (query) => document.querySelector(query).classList.remove('hidden');
+	const hideItem = (query) =>
+		document.querySelector(query).classList.add('hidden');
+	const showItem = (query) =>
+		document.querySelector(query).classList.remove('hidden');
 
-  return {
-   renderBoard,
-   updateNames,
-   updateWins,
-   mark,
-   updateGameMsg,
-   hideGameMsg,
-   hideItem,
-   showItem
-  }
+	const hideGameArea = () => {
+		if (
+			![...document.querySelector('#gameArea').classList].includes('hidden')
+		) {
+			hideItem('#gameArea');
+		}
+	};
+
+	const removeForm = () => {
+		if (document.querySelector('form')) document.querySelector('form').remove();
+	};
+	return {
+		renderBoard,
+		updateNames,
+		updateWins,
+		mark,
+		updateGameMsg,
+		hideGameMsg,
+		hideItem,
+		showItem,
+		hideGameArea,
+		removeForm,
+	};
 })();
 
 // player factory
 const Player = (name, sign) => {
-  const _name = name;
-  const _sign = sign;
-  let _wins = 0;
-  const getName = () => _name;
-  const getSign = () => _sign;
-  const mark = (spot) => {
-    gameBoard.mark(spot, _sign);
-  }
+	const _name = name;
+	const _sign = sign;
+	let _wins = 0;
+	const getName = () => _name;
+	const getSign = () => _sign;
+	const mark = (spot) => {
+		gameBoard.mark(spot, _sign);
+	};
 
-  const getWins = () => _wins;
-  const incrementWins = () => _wins += 1;
+	const getWins = () => _wins;
+	const incrementWins = () => (_wins += 1);
 
-  return {
-    getName,
-    getSign,
-    getWins,
-    incrementWins,
-    mark
-  }
-}
+	return {
+		getName,
+		getSign,
+		getWins,
+		incrementWins,
+		mark,
+	};
+};
 
 // game module
 const game = (() => {
-  let _players = {};
-  let _turn;
-  let _gameOver = false;
-  const _winConditions = {
-    row1: [0,1,2],
-    row2: [3,4,5],
-    row3: [6,7,8],
-    col1: [0,3,6],
-    col2: [1,4,7],
-    col3: [2,5,8],
-    diag1: [0,4,8],
-    diag2: [2,4,6]
-  };
+	let _players = {};
+	let _turn;
+	let _gameOver = false;
+	let _AISettings = {
+		AIGame: false,
+		AIDifficulty: undefined,
+	};
 
-  const setPlayers = (playerOne, playerTwo) => {
-    _players = {
-      1: playerOne,
-      2: playerTwo
-    }
-  }
-  const getPlayers = () => _players;
-  const getPlayerOne = () => _players[1];
-  const getPlayerTwo = () => _players[2];
-  const getXPlayerNumber = () => {
-    for (const playerNumber in _players) {
-      if (_players[playerNumber].getSign() == 'X') {
-        return playerNumber;
-      }
-    }
-  }
-  const setPlayerTurn = (playerNumber = 1) => {
-    _turn = playerNumber;
-    displayController.updateGameMsg(`${_players[playerNumber].getName()}'s turn`);
-  }
+	const _winConditions = {
+		row1: [0, 1, 2],
+		row2: [3, 4, 5],
+		row3: [6, 7, 8],
+		col1: [0, 3, 6],
+		col2: [1, 4, 7],
+		col3: [2, 5, 8],
+		diag1: [0, 4, 8],
+		diag2: [2, 4, 6],
+	};
 
-  const swapTurns = () => {
-    _turn == 1 ? setPlayerTurn(2) : setPlayerTurn(1);
-  }
+	const setPlayers = (playerOne, playerTwo) => {
+		_players = {
+			1: playerOne,
+			2: playerTwo,
+		};
+	};
+	const getPlayers = () => _players;
+	const getPlayerOne = () => _players[1];
+	const getPlayerTwo = () => _players[2];
+	const getXPlayerNumber = () => {
+		for (const playerNumber in _players) {
+			if (_players[playerNumber].getSign() == 'X') {
+				return playerNumber;
+			}
+		}
+	};
+	const setPlayerTurn = (playerNumber = 1) => {
+		_turn = playerNumber;
+		displayController.updateGameMsg(
+			`${_players[playerNumber].getName()}'s turn`
+		);
+	};
 
-  const getCurrentPlayerSign = () => _players[_turn].getSign();
+	const swapTurns = () => {
+		_turn == 1 ? setPlayerTurn(2) : setPlayerTurn(1);
+	};
 
-  const checkForWin = () => {
-    const players = game.getPlayers();
-    const playerOne = game.getPlayerOne();
-    const playerTwo = game.getPlayerTwo();
+	const getCurrentPlayerSign = () => _players[_turn].getSign();
 
-    const gb = gameBoard.getBoard();
-    for (const playerNumber in players) {
-      const sign = players[playerNumber].getSign();
-      function doesIdxMatchSign(idx) {
-        return gb[idx] == sign;
-      }
-      for (const key in _winConditions) {
-        if (_winConditions[key].every(doesIdxMatchSign)) {
-          players[playerNumber].incrementWins();
-          displayController.updateWins(playerOne, playerTwo);
-          displayController.updateGameMsg(`${game.getPlayers()[playerNumber].getName()} wins!`);
-          game.endGame();
-          return true;
-        }
-      }
-    };
+	const checkForWin = () => {
+		const players = game.getPlayers();
+		const playerOne = game.getPlayerOne();
+		const playerTwo = game.getPlayerTwo();
 
-    const isItFilled = (item) => Boolean(item) == true;
-    if (gb.filter(isItFilled).length == 9) {
-      displayController.updateGameMsg("It's a tie!");
-      game.endGame();
-    }
-  }
+		const gb = gameBoard.getBoard();
+		for (const playerNumber in players) {
+			const sign = players[playerNumber].getSign();
+			function doesIdxMatchSign(idx) {
+				return gb[idx] == sign;
+			}
+			for (const key in _winConditions) {
+				if (_winConditions[key].every(doesIdxMatchSign)) {
+					players[playerNumber].incrementWins();
+					displayController.updateWins(playerOne, playerTwo);
+					displayController.updateGameMsg(
+						`${game.getPlayers()[playerNumber].getName()} wins!`
+					);
+					game.endGame();
+					return true;
+				}
+			}
+		}
 
-  const isGameOver = () => _gameOver;
-  const endGame = () => _gameOver = true;
+		const isItFilled = (item) => Boolean(item) == true;
+		if (gb.filter(isItFilled).length == 9) {
+			displayController.updateGameMsg("It's a tie!");
+			game.endGame();
+		}
+	};
 
-  const newGame = () => {
-    _gameOver = false;
-    gameBoard.resetBoard();
-    game.setPlayerTurn(getXPlayerNumber());
-    displayController.renderBoard(gameBoard.getBoard());
-    displayController.updateNames();
-    displayController.updateWins();
-    displayController.updateGameMsg('New game started.');
-  }
+	const isGameOver = () => _gameOver;
+	const endGame = () => (_gameOver = true);
 
-  return {
-    setPlayers,
-    getPlayers,
-    getPlayerOne,
-    getPlayerTwo,
-    setPlayerTurn,
-    swapTurns,
-    getCurrentPlayerSign,
-    isGameOver,
-    checkForWin,
-    endGame,
-    newGame,
-  }
+	const newGame = () => {
+		_gameOver = false;
+		gameBoard.resetBoard();
+		game.setPlayerTurn(getXPlayerNumber());
+		displayController.renderBoard(gameBoard.getBoard());
+		displayController.updateNames();
+		displayController.updateWins();
+		displayController.updateGameMsg('New game started.');
+		AIMove();
+	};
+
+	const getAISettings = () => _AISettings;
+	const setAISettings = (newAISettingsObj) => {
+		for (const key in newAISettingsObj) {
+			_AISettings[key] = newAISettingsObj[key];
+		}
+	};
+	const AIMove = () => {
+		if (getAISettings()['AIGame'] && _turn == 2) {
+			console.log('AI Move');
+		}
+	};
+
+	return {
+		setPlayers,
+		getPlayers,
+		getPlayerOne,
+		getPlayerTwo,
+		setPlayerTurn,
+		swapTurns,
+		getCurrentPlayerSign,
+		isGameOver,
+		checkForWin,
+		endGame,
+		newGame,
+		getAISettings,
+		setAISettings,
+		AIMove,
+	};
 })();
 
+// Form Helpers
+const setAttributes = (el, object) => {
+	for (const attr in object) {
+		el.setAttribute(attr, object[attr]);
+	}
+};
+const br = () => document.createElement('br');
+const appendChildren = (parentEl, ...childEls) => {
+	childEls.forEach((child) => parentEl.appendChild(child));
+};
 
+/* AIBotBtn */
+const AIBotBtn = document.getElementById('AIBotBtn');
+AIBotBtn.addEventListener('click', (e) => {
+	displayController.hideGameArea();
+	displayController.removeForm();
 
+	// add form to dom
+	const form = document.createElement('form');
+	const playerOneLabel = document.createElement('label');
+	playerOneLabel.setAttribute('for', 'playerOneName');
+	playerOneLabel.textContent = 'Player 1';
+	const playerOneInput = document.createElement('input');
+	setAttributes(playerOneInput, {
+		type: 'text',
+		id: 'playerOneName',
+		name: 'playerOneName',
+		placeholder: 'Enter Name',
+		autocomplete: 'off',
+		required: '',
+	});
+
+	const swapSign = (e) => {
+		e.preventDefault();
+		if (playerOneSign.textContent == 'X') {
+			playerOneSign.textContent = 'O';
+			AISign.textContent = 'X';
+		} else {
+			playerOneSign.textContent = 'X';
+			AISign.textContent = 'O';
+		}
+	};
+	const playerOneSign = document.createElement('button');
+	playerOneSign.textContent = 'X';
+	playerOneSign.addEventListener('click', swapSign);
+
+	const AIDifficultyLabel = document.createElement('label');
+	AIDifficultyLabel.setAttribute('for', 'AI Bot Difficulty');
+	AIDifficultyLabel.textContent = 'AI Bot Difficulty';
+	const AIDifficultySelect = document.createElement('select');
+	setAttributes(AIDifficultySelect, {
+		type: 'select',
+		id: 'AIBot',
+		name: 'AIBot',
+		required: '',
+	});
+
+	const createOptions = (...values) => {
+		values.forEach((value) => {
+			const option = document.createElement('option');
+			option.value = value;
+			option.textContent = value;
+			AIDifficultySelect.appendChild(option);
+		});
+	};
+	createOptions('Easy', 'Hard', 'Impossible');
+
+	const AISign = document.createElement('button');
+	AISign.textContent = 'O';
+	AISign.addEventListener('click', swapSign);
+
+	const submitBtn = document.createElement('input');
+	setAttributes(submitBtn, {
+		type: 'submit',
+		value: 'Submit',
+	});
+
+	submitBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		// form hides
+		displayController.hideItem('form');
+		displayController.showItem('#gameArea');
+		// game starts and is shown
+		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
+		const AI = Player('AI Bot', AISign.textContent);
+		game.setPlayers(playerOne, AI);
+		game.setAISettings({
+			AIGame: true,
+			AIDifficulty: AIDifficultySelect.value,
+		});
+		game.newGame();
+		// destroy form
+		form.remove();
+	});
+
+	appendChildren(
+		form,
+		playerOneLabel,
+		playerOneInput,
+		playerOneSign,
+		br(),
+		AIDifficultyLabel,
+		AIDifficultySelect,
+		AISign,
+		br(),
+		submitBtn
+	);
+
+	document.querySelector('.container').appendChild(form);
+});
 
 /* twoPlayersBtn */
 const twoPlayersBtn = document.getElementById('twoPlayersBtn');
 twoPlayersBtn.addEventListener('click', (e) => {
-  if (![...document.querySelector('#gameArea').classList].includes('hidden'))
- {
-   displayController.hideItem('#gameArea');
- }
+	displayController.hideGameArea();
+	displayController.removeForm();
 
-  // Helpers 
-  const setAttributes = (el, object) => {
-    for (const attr in object) {
-      el.setAttribute(attr, object[attr])
-    }
-  }
-  const br = () => document.createElement('br');
-  const appendChildren = (parentEl, ...childEls) => {
-    childEls.forEach(child => parentEl.appendChild(child));
-  }
+	// add form to dom
+	const form = document.createElement('form');
+	const playerOneLabel = document.createElement('label');
+	playerOneLabel.setAttribute('for', 'playerOneName');
+	playerOneLabel.textContent = 'Player 1';
+	const playerOneInput = document.createElement('input');
+	setAttributes(playerOneInput, {
+		type: 'text',
+		id: 'playerOneName',
+		name: 'playerOneName',
+		placeholder: 'Enter Name',
+		autocomplete: 'off',
+		required: '',
+	});
 
-  if (!document.querySelector('form')) {
-    // add form to dom
-    const form = document.createElement('form');
-    const playerOneLabel = document.createElement('label');
-    playerOneLabel.setAttribute('for', 'playerOneName');
-    playerOneLabel.textContent = 'Player 1';
-    const playerOneInput = document.createElement('input');
-    setAttributes(playerOneInput, {
-      'type': 'text',
-      'id': 'playerOneName',
-      'name': 'playerOneName',
-      'placeholder': 'Enter Name',
-      'autocomplete': 'off',
-      'required' : ''
-    });
+	const swapSign = (e) => {
+		e.preventDefault();
+		if (playerOneSign.textContent == 'X') {
+			playerOneSign.textContent = 'O';
+			playerTwoSign.textContent = 'X';
+		} else {
+			playerOneSign.textContent = 'X';
+			playerTwoSign.textContent = 'O';
+		}
+	};
+	const playerOneSign = document.createElement('button');
+	playerOneSign.textContent = 'X';
+	playerOneSign.addEventListener('click', swapSign);
 
+	const playerTwoLabel = document.createElement('label');
+	playerTwoLabel.setAttribute('for', 'playerTwoName');
+	playerTwoLabel.textContent = 'Player 2';
+	const playerTwoInput = document.createElement('input');
+	setAttributes(playerTwoInput, {
+		type: 'text',
+		id: 'playerTwoName',
+		name: 'playerTwoName',
+		placeholder: 'Enter Name',
+		autocomplete: 'off',
+		required: '',
+	});
 
-    function swapSign(e) {
-      e.preventDefault();
-      if (playerOneSign.textContent == 'X') {
-        playerOneSign.textContent = 'O';
-        playerTwoSign.textContent = 'X';
-      } else {
-        playerOneSign.textContent = 'X';
-        playerTwoSign.textContent = 'O';
-      }
-    }
-    const playerOneSign = document.createElement('button');
-    playerOneSign.textContent = 'X';
-    playerOneSign.addEventListener('click', swapSign);
+	const playerTwoSign = document.createElement('button');
+	playerTwoSign.textContent = 'O';
+	playerTwoSign.addEventListener('click', swapSign);
 
-    const playerTwoLabel = document.createElement('label');
-    playerTwoLabel.setAttribute('for', 'playerTwoName');
-    playerTwoLabel.textContent = 'Player 2';
-    const playerTwoInput = document.createElement('input');
-    setAttributes(playerTwoInput, {
-      'type': 'text',
-      'id': 'playerTwoName',
-      'name': 'playerTwoName',
-      'placeholder': 'Enter Name',
-      'autocomplete': 'off',
-      'required' : ''
-    });
-    
-    const playerTwoSign = document.createElement('button');
-    playerTwoSign.textContent = 'O';
-    playerTwoSign.addEventListener('click', swapSign)
+	const submitBtn = document.createElement('input');
+	setAttributes(submitBtn, {
+		type: 'submit',
+		value: 'Submit',
+	});
 
+	submitBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		// form hides
+		displayController.hideItem('form');
+		displayController.showItem('#gameArea');
+		// game starts and is shown
+		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
+		const playerTwo = Player(playerTwoInput.value, playerTwoSign.textContent);
+		game.setPlayers(playerOne, playerTwo);
+		game.setAISettings({ AIGame: false });
+		game.newGame();
+		// destroy form
+		form.remove();
+	});
 
-    const submitBtn = document.createElement('input');
-    setAttributes(submitBtn, {
-      'type': 'submit',
-      'value': 'Submit'
-    });
+	appendChildren(
+		form,
+		playerOneLabel,
+		playerOneInput,
+		playerOneSign,
+		br(),
+		playerTwoLabel,
+		playerTwoInput,
+		playerTwoSign,
+		br(),
+		submitBtn
+	);
 
-    
-    submitBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log(e);
-      console.log('submitted');
-      // form hides
-      displayController.hideItem('form');
-      displayController.showItem('#gameArea');
-      // game starts and is shown
-      const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
-      const playerTwo = Player(playerTwoInput.value, playerTwoSign.textContent);
-      game.setPlayers(playerOne, playerTwo);
-      game.newGame();
-      // destroy form
-      form.remove();
-    })
-    
-    appendChildren(form, 
-      playerOneLabel, 
-      playerOneInput, 
-      playerOneSign, 
-      br(), 
-      playerTwoLabel, 
-      playerTwoInput,
-      playerTwoSign,
-      br(), 
-      submitBtn
-    );
-
-    document.querySelector('.container').appendChild(form);
-  }
-  
-
-})
+	document.querySelector('.container').appendChild(form);
+});
 
 const newGameBtn = document.getElementById('newGameBtn');
 newGameBtn.addEventListener('click', game.newGame);
