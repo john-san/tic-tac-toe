@@ -7,18 +7,24 @@ const gameBoard = (() => {
 		console.log(_gb);
 	};
 	const getBoard = () => _gb;
-
-	const mark = (spot, sign) => {
+	const getOpenSpotIdxs = () => {
+		const openSpotIdxs = [];
+		for (let i = 0; i < _gb.length; i++) {
+			if (_gb[i] == undefined) openSpotIdxs.push(i);
+		}
+		return openSpotIdxs;
+	};
+	const mark = async (spot, sign) => {
 		if (_gb[spot] == undefined) {
 			_gb[spot] = sign;
 			displayController.mark(spot, sign);
 			game.swapTurns();
-			game.AIMove();
 		} else {
-			// alert("spot is filled already!");
+			console.log('spot is filled already!');
 		}
 
-		game.checkForWin();
+		await game.checkForWin();
+		game.AIMove();
 	};
 
 	const resetBoard = () => (_gb = new Array(9));
@@ -27,6 +33,7 @@ const gameBoard = (() => {
 		getBoard,
 		mark,
 		resetBoard,
+		getOpenSpotIdxs,
 	};
 })();
 
@@ -44,6 +51,7 @@ const displayController = (() => {
 			cell.addEventListener('click', (e) => {
 				if (!game.isGameOver()) {
 					const spot = parseInt(e.target.getAttribute('data-attribute'));
+					console.log(`Player marking ${spot}`);
 					gameBoard.mark(spot, game.getCurrentPlayerSign());
 				}
 			});
@@ -140,11 +148,23 @@ const Player = (name, sign) => {
 const AIBot = (difficulty, sign) => {
 	const prototype = Player('AI Bot', sign);
 	const _difficulty = difficulty;
+	const _sign = sign;
+	const mark = (spot) => {
+		gameBoard.mark(spot, _sign);
+	};
 
 	const getDifficulty = () => _difficulty;
 
 	const AIMove = () => {
-		console.log('AI Move');
+		const getRandomNumber = (min, max) => {
+			// exclusive of max
+			return Math.floor(Math.random() * (max - min) + min);
+		};
+		// console.log('AI making move');
+		const availableIdxs = gameBoard.getOpenSpotIdxs();
+		const randomSpot = getRandomNumber(0, availableIdxs.length);
+		console.log(`AI marking ${randomSpot}`);
+		mark(availableIdxs[randomSpot]);
 	};
 
 	return Object.assign({}, prototype, {
@@ -237,7 +257,7 @@ const game = (() => {
 	const endGame = () => (_gameOver = true);
 
 	const AIMove = () => {
-		if (_AIGame && getPlayerTurn() == 2) {
+		if (_AIGame && getPlayerTurn() == 2 && _gameOver == false) {
 			getPlayerTwo().AIMove();
 		}
 	};
