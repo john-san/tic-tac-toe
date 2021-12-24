@@ -136,15 +136,29 @@ const Player = (name, sign) => {
 	};
 };
 
+// ai bot factory
+const AIBot = (difficulty, sign) => {
+	const prototype = Player('AI Bot', sign);
+	const _difficulty = difficulty;
+
+	const getDifficulty = () => _difficulty;
+
+	const AIMove = () => {
+		console.log('AI Move');
+	};
+
+	return Object.assign({}, prototype, {
+		getDifficulty,
+		AIMove,
+	});
+};
+
 // game module
 const game = (() => {
 	let _players = {};
 	let _turn;
 	let _gameOver = false;
-	let _AISettings = {
-		AIGame: false,
-		AIDifficulty: undefined,
-	};
+	let _AIGame = false;
 
 	const _winConditions = {
 		row1: [0, 1, 2],
@@ -169,10 +183,12 @@ const game = (() => {
 	const getXPlayerNumber = () => {
 		for (const playerNumber in _players) {
 			if (_players[playerNumber].getSign() == 'X') {
-				return playerNumber;
+				return parseInt(playerNumber);
 			}
 		}
 	};
+
+	const getPlayerTurn = () => _turn;
 	const setPlayerTurn = (playerNumber = 1) => {
 		_turn = playerNumber;
 		displayController.updateGameMsg(
@@ -220,6 +236,14 @@ const game = (() => {
 	const isGameOver = () => _gameOver;
 	const endGame = () => (_gameOver = true);
 
+	const AIMove = () => {
+		if (_AIGame && getPlayerTurn() == 2) {
+			getPlayerTwo().AIMove();
+		}
+	};
+
+	const setAIGame = (setting) => (_AIGame = setting);
+
 	const newGame = () => {
 		_gameOver = false;
 		gameBoard.resetBoard();
@@ -231,23 +255,12 @@ const game = (() => {
 		AIMove();
 	};
 
-	const getAISettings = () => _AISettings;
-	const setAISettings = (newAISettingsObj) => {
-		for (const key in newAISettingsObj) {
-			_AISettings[key] = newAISettingsObj[key];
-		}
-	};
-	const AIMove = () => {
-		if (getAISettings()['AIGame'] && _turn == 2) {
-			console.log('AI Move');
-		}
-	};
-
 	return {
 		setPlayers,
 		getPlayers,
 		getPlayerOne,
 		getPlayerTwo,
+		getPlayerTurn,
 		setPlayerTurn,
 		swapTurns,
 		getCurrentPlayerSign,
@@ -255,9 +268,8 @@ const game = (() => {
 		checkForWin,
 		endGame,
 		newGame,
-		getAISettings,
-		setAISettings,
 		AIMove,
+		setAIGame,
 	};
 })();
 
@@ -345,12 +357,9 @@ AIBotBtn.addEventListener('click', (e) => {
 		displayController.showItem('#gameArea');
 		// game starts and is shown
 		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
-		const AI = Player('AI Bot', AISign.textContent);
+		const AI = AIBot(AIDifficultySelect.value, AISign.textContent);
 		game.setPlayers(playerOne, AI);
-		game.setAISettings({
-			AIGame: true,
-			AIDifficulty: AIDifficultySelect.value,
-		});
+		game.setAIGame(true);
 		game.newGame();
 		// destroy form
 		form.remove();
@@ -439,7 +448,7 @@ twoPlayersBtn.addEventListener('click', (e) => {
 		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
 		const playerTwo = Player(playerTwoInput.value, playerTwoSign.textContent);
 		game.setPlayers(playerOne, playerTwo);
-		game.setAISettings({ AIGame: false });
+		game.setAIGame(false);
 		game.newGame();
 		// destroy form
 		form.remove();
