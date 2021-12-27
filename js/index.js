@@ -14,7 +14,7 @@ const gameBoard = (() => {
 		}
 		return openSpotIdxs;
 	};
-	const mark = async (spot, sign) => {
+	const mark = (spot, sign) => {
 		if (_gb[spot] == undefined) {
 			_gb[spot] = sign;
 			displayController.mark(spot, sign);
@@ -23,7 +23,13 @@ const gameBoard = (() => {
 			console.log('spot is filled already!');
 		}
 
-		await game.checkForWin();
+		if (game.checkForWin(game.getPlayerOne())) {
+			game.declareWinner(game.getPlayerOne());
+		} else if (game.checkForWin(game.getPlayerTwo())) {
+			game.declareWinner(game.getPlayerTwo());
+		}
+
+		game.checkForTie();
 		game.AIMove();
 	};
 
@@ -211,6 +217,7 @@ const game = (() => {
 	const getPlayerTurn = () => _turn;
 	const setPlayerTurn = (playerNumber = 1) => {
 		_turn = playerNumber;
+		console.log(`${_players[playerNumber].getName()}'s turn`);
 		displayController.updateGameMsg(
 			`${_players[playerNumber].getName()}'s turn`
 		);
@@ -222,35 +229,35 @@ const game = (() => {
 
 	const getCurrentPlayerSign = () => _players[_turn].getSign();
 
-	const checkForWin = () => {
-		const players = game.getPlayers();
-		const playerOne = game.getPlayerOne();
-		const playerTwo = game.getPlayerTwo();
-
-		const gb = gameBoard.getBoard();
-		for (const playerNumber in players) {
-			const sign = players[playerNumber].getSign();
-			function doesIdxMatchSign(idx) {
-				return gb[idx] == sign;
-			}
-			for (const key in _winConditions) {
-				if (_winConditions[key].every(doesIdxMatchSign)) {
-					players[playerNumber].incrementWins();
-					displayController.updateWins(playerOne, playerTwo);
-					displayController.updateGameMsg(
-						`${game.getPlayers()[playerNumber].getName()} wins!`
-					);
-					game.endGame();
-					return true;
-				}
-			}
-		}
-
+	const checkForTie = () => {
 		const isItFilled = (item) => Boolean(item) == true;
+		const gb = gameBoard.getBoard();
 		if (gb.filter(isItFilled).length == 9) {
 			displayController.updateGameMsg("It's a tie!");
 			game.endGame();
 		}
+	};
+
+	const checkForWin = (player) => {
+		const gb = gameBoard.getBoard();
+		const sign = player.getSign();
+		const doesIdxMatchSign = (idx) => gb[idx] == sign;
+
+		for (const key in _winConditions) {
+			if (_winConditions[key].every(doesIdxMatchSign)) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	const declareWinner = (player) => {
+		player.incrementWins();
+		displayController.updateWins();
+		console.log(`${player.getName()} wins!`);
+		displayController.updateGameMsg(`${player.getName()} wins!`);
+		game.endGame();
 	};
 
 	const isGameOver = () => _gameOver;
@@ -286,6 +293,8 @@ const game = (() => {
 		getCurrentPlayerSign,
 		isGameOver,
 		checkForWin,
+		checkForTie,
+		declareWinner,
 		endGame,
 		newGame,
 		AIMove,
