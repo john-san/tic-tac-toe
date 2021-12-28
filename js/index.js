@@ -166,7 +166,7 @@ const AIBot = (difficulty, sign) => {
 	const getDifficulty = () => _difficulty;
 
 	const AIMove = () => {
-		function minimax(newBoard, player) {
+		const minimax = (newBoard, player) => {
 			let availSpots = gameBoard.getOpenSpotIdxs();
 
 			if (game.checkForWin(game.getPlayerOne())) {
@@ -225,9 +225,9 @@ const AIBot = (difficulty, sign) => {
 			}
 
 			return moves[bestMove];
-		}
+		};
 
-		if (_difficulty == 'Easy') {
+		const randomMove = () => {
 			const getRandomNumber = (min, max) => {
 				// exclusive of max
 				return Math.floor(Math.random() * (max - min) + min);
@@ -235,12 +235,29 @@ const AIBot = (difficulty, sign) => {
 			// console.log('AI making move');
 			const availableIdxs = gameBoard.getOpenSpotIdxs();
 			const randomSpot = getRandomNumber(0, availableIdxs.length);
+			console.log('AI making random move.');
 			console.log(`AI marking ${randomSpot}`);
 			mark(availableIdxs[randomSpot]);
-		} else if (_difficulty == 'Impossible') {
+		};
+
+		const optimalMove = () => {
 			const result = minimax(gameBoard.getBoard(), game.getPlayerTwo());
-			console.log(result);
+			console.log('AI making optimal move.');
+			console.log(`AI marking ${result.index}`);
 			mark(result.index);
+		};
+
+		if (_difficulty == 'Easy') {
+			randomMove();
+		} else if (_difficulty == 'Hard') {
+			const num = Math.random();
+			if (num > 0.34) {
+				optimalMove();
+			} else {
+				randomMove();
+			}
+		} else if (_difficulty == 'Impossible') {
+			optimalMove();
 		}
 	};
 
