@@ -27,9 +27,8 @@ const gameBoard = (() => {
 			game.declareWinner(game.getPlayerOne());
 		} else if (game.checkForWin(game.getPlayerTwo())) {
 			game.declareWinner(game.getPlayerTwo());
-		}
-
-		if (game.checkForTie()) {
+		} else if (game.checkForTie()) {
+			console.log("It's a tie!");
 			displayController.updateGameMsg("It's a tie!");
 			game.endGame();
 		}
@@ -249,9 +248,16 @@ const AIBot = (difficulty, sign) => {
 
 		if (_difficulty == 'Easy') {
 			randomMove();
-		} else if (_difficulty == 'Hard') {
+		} else if (_difficulty == 'Medium') {
 			const num = Math.random();
 			if (num > 0.34) {
+				optimalMove();
+			} else {
+				randomMove();
+			}
+		} else if (_difficulty == 'Hard') {
+			const num = Math.random();
+			if (num > 0.2) {
 				optimalMove();
 			} else {
 				randomMove();
@@ -452,7 +458,7 @@ AIBotBtn.addEventListener('click', (e) => {
 			AIDifficultySelect.appendChild(option);
 		});
 	};
-	createOptions('Easy', 'Hard', 'Impossible');
+	createOptions('Easy', 'Medium', 'Hard', 'Impossible');
 
 	const AISign = document.createElement('button');
 	AISign.textContent = 'O';
@@ -470,7 +476,10 @@ AIBotBtn.addEventListener('click', (e) => {
 		displayController.hideItem('form');
 		displayController.showItem('#gameArea');
 		// game starts and is shown
-		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
+		const playerOne = Player(
+			playerOneInput.value || 'Player 1',
+			playerOneSign.textContent
+		);
 		const AI = AIBot(AIDifficultySelect.value, AISign.textContent);
 		game.setPlayers(playerOne, AI);
 		game.setAIGame(true);
@@ -559,8 +568,14 @@ twoPlayersBtn.addEventListener('click', (e) => {
 		displayController.hideItem('form');
 		displayController.showItem('#gameArea');
 		// game starts and is shown
-		const playerOne = Player(playerOneInput.value, playerOneSign.textContent);
-		const playerTwo = Player(playerTwoInput.value, playerTwoSign.textContent);
+		const playerOne = Player(
+			playerOneInput.value || 'Player 1',
+			playerOneSign.textContent
+		);
+		const playerTwo = Player(
+			playerTwoInput.value || 'Player 2',
+			playerTwoSign.textContent
+		);
 		game.setPlayers(playerOne, playerTwo);
 		game.setAIGame(false);
 		game.newGame();

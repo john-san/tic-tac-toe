@@ -1,77 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@400;700;900&display=swap');
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
 h1 {
-  text-align: center;
+	text-align: center;
+	font-weight: 700;
 }
 .container {
-  width: 90%;
-  margin: 0 auto;
-  text-align: center;
+	width: 90%;
+	margin: 0 auto;
+	text-align: center;
 }
 
 #gameBoard {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 375px;
-  max-height: 375px;
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	margin: 0 auto;
+	max-width: 375px;
+	max-height: 375px;
 }
 
 .cell {
-  flex-basis: 33.33%;
-  height: 125px;
-  border: 1px solid black;
-  box-sizing: border-box;
-  font-size: 72px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+	flex-basis: 33.33%;
+	height: 125px;
+	border: 1px solid black;
+	box-sizing: border-box;
+	font-size: 72px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	font-family: 'Permanent Marker', cursive;
+	color: red;
 }
 
 #newGameBtn {
-  margin-top: 15px;
-  margin-bottom: 0;
+	margin-top: 15px;
+	margin-bottom: 0;
 }
 
 button {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .hidden {
-  display: none;
+	display: none;
 }
 
 .scoreboard {
-  margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 .gameOptions {
-  margin-bottom: 15px;;
+	margin-bottom: 15px;
 }
 
-
 @media screen and (min-width: 768px) {
-  .container {
-    width: 80%;
-  }
-  #gameBoard {
-    max-width: 450px;
-    max-height: 450px;
-  }
-  .cell {
-    height: 150px;
-  }
+	.container {
+		width: 80%;
+	}
+	#gameBoard {
+		max-width: 450px;
+		max-height: 450px;
+	}
+	.cell {
+		height: 150px;
+	}
 }
 
 @media screen and (min-width: 1024px) {
-  .container {
-    width: 70%;
-  }
-  #gameBoard {
-    max-width: 525px;
-    max-height: 525px;
-  }
-  .cell {
-    height: 175px;
-  }
+	.container {
+		width: 70%;
+	}
+	#gameBoard {
+		max-width: 525px;
+		max-height: 525px;
+	}
+	.cell {
+		height: 175px;
+	}
 }
