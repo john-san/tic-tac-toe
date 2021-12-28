@@ -29,7 +29,11 @@ const gameBoard = (() => {
 			game.declareWinner(game.getPlayerTwo());
 		}
 
-		game.checkForTie();
+		if (game.checkForTie()) {
+			displayController.updateGameMsg("It's a tie!");
+			game.endGame();
+		}
+
 		game.AIMove();
 	};
 
@@ -162,15 +166,82 @@ const AIBot = (difficulty, sign) => {
 	const getDifficulty = () => _difficulty;
 
 	const AIMove = () => {
-		const getRandomNumber = (min, max) => {
-			// exclusive of max
-			return Math.floor(Math.random() * (max - min) + min);
-		};
-		// console.log('AI making move');
-		const availableIdxs = gameBoard.getOpenSpotIdxs();
-		const randomSpot = getRandomNumber(0, availableIdxs.length);
-		console.log(`AI marking ${randomSpot}`);
-		mark(availableIdxs[randomSpot]);
+		function minimax(newBoard, player) {
+			let availSpots = gameBoard.getOpenSpotIdxs();
+
+			if (game.checkForWin(game.getPlayerOne())) {
+				return { score: -10 };
+			} else if (game.checkForWin(game.getPlayerTwo())) {
+				return { score: 10 };
+			} else if (availSpots.length === 0) {
+				return { score: 0 };
+			}
+
+			let moves = [];
+
+			for (let i = 0; i < availSpots.length; i++) {
+				//create an object for each and store the index of that spot
+				var move = {};
+				move.index = availSpots[i];
+
+				// set empty spot to the current player;
+				newBoard[availSpots[i]] = player.getSign();
+
+				/*collect the score resulted from calling minimax 
+      on the opponent of the current player*/
+				if (player == game.getPlayerTwo()) {
+					let result = minimax(newBoard, game.getPlayerOne());
+					move.score = result.score;
+				} else {
+					let result = minimax(newBoard, game.getPlayerTwo());
+					move.score = result.score;
+				}
+
+				// reset spot to empty
+				newBoard[availSpots[i]] = undefined;
+
+				moves.push(move);
+			}
+
+			// if it is the computer's turn loop over the moves and choose the move with the highest score
+			let bestMove;
+			if (player == game.getPlayerTwo()) {
+				let bestScore = -10000;
+				for (let i = 0; i < moves.length; i++) {
+					if (moves[i].score > bestScore) {
+						bestScore = moves[i].score;
+						bestMove = i;
+					}
+				}
+			} else {
+				// else loop over the moves and choose the move with the lowest score
+				let bestScore = 10000;
+				for (let i = 0; i < moves.length; i++) {
+					if (moves[i].score < bestScore) {
+						bestScore = moves[i].score;
+						bestMove = i;
+					}
+				}
+			}
+
+			return moves[bestMove];
+		}
+
+		if (_difficulty == 'Easy') {
+			const getRandomNumber = (min, max) => {
+				// exclusive of max
+				return Math.floor(Math.random() * (max - min) + min);
+			};
+			// console.log('AI making move');
+			const availableIdxs = gameBoard.getOpenSpotIdxs();
+			const randomSpot = getRandomNumber(0, availableIdxs.length);
+			console.log(`AI marking ${randomSpot}`);
+			mark(availableIdxs[randomSpot]);
+		} else if (_difficulty == 'Impossible') {
+			const result = minimax(gameBoard.getBoard(), game.getPlayerTwo());
+			console.log(result);
+			mark(result.index);
+		}
 	};
 
 	return Object.assign({}, prototype, {
@@ -232,10 +303,7 @@ const game = (() => {
 	const checkForTie = () => {
 		const isItFilled = (item) => Boolean(item) == true;
 		const gb = gameBoard.getBoard();
-		if (gb.filter(isItFilled).length == 9) {
-			displayController.updateGameMsg("It's a tie!");
-			game.endGame();
-		}
+		return gb.filter(isItFilled).length == 9 ? true : false;
 	};
 
 	const checkForWin = (player) => {
