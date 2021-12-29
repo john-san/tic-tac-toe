@@ -165,11 +165,6 @@ button.submit {
 	margin-bottom: 15px;
 }
 
-.gameOptions .button-group {
-	margin: 0 auto;
-	width: 50%;
-}
-
 #gameMsg {
 	margin-top: 10px;
 }
@@ -222,6 +217,10 @@ footer i:hover {
 	}
 	.game-cell {
 		height: 150px;
+	}
+	.gameOptions .button-group {
+		margin: 0 auto;
+		width: 50%;
 	}
 }
 
