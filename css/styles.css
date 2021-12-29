@@ -1,5 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@400;700;900&display=swap');
 
+:root {
+	--blue-whale: #043a4e;
+	--gray-nurse: #e0e4db;
+	--gallery: #ebebeb;
+	--gumbo: #789fac;
+	--niagara: #0ea489;
+	--corn: #e3c306;
+	--dark-corn: #c2a503;
+	--font-color: white;
+}
+
 body,
 h1,
 h2,
@@ -10,6 +21,40 @@ h3 {
 h1 {
 	text-align: center;
 	font-weight: 700;
+	background: var(--gallery);
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border-bottom: 3px solid black;
+	font-size: 3rem;
+}
+
+h1 span:nth-child(1) {
+	color: var(--niagara);
+}
+
+h1 span:nth-child(2) {
+	color: var(--blue-whale);
+}
+
+h1 span:nth-child(3) {
+	color: var(--corn);
+}
+
+body {
+	background-color: var(--blue-whale);
+}
+
+body,
+label,
+.button.success,
+.button.success:hover,
+.button.success.disabled,
+.button.success.disabled:focus,
+.button.success.disabled:hover,
+.button.success[disabled],
+.button.success[disabled]:focus,
+.button.success[disabled]:hover {
+	color: var(--font-color);
 }
 
 .container {
@@ -30,7 +75,7 @@ h1 {
 .game-cell {
 	flex-basis: 33.33%;
 	height: 125px;
-	border: 1px solid black;
+	border: 1px solid white;
 	box-sizing: border-box;
 	font-size: 72px;
 	display: flex;
@@ -38,7 +83,45 @@ h1 {
 	align-items: center;
 	cursor: pointer;
 	font-family: 'Permanent Marker', cursive;
-	color: red;
+}
+
+.game-cell:first-child {
+	border-top: 0;
+	border-left: 0;
+}
+
+.game-cell:nth-child(2) {
+	border-top: 0;
+}
+
+.game-cell:nth-child(3) {
+	border-top: 0;
+	border-right: 0;
+}
+
+.game-cell:nth-child(4) {
+	border-left: 0;
+}
+
+.game-cell:nth-child(6) {
+	border-right: 0;
+}
+.game-cell:nth-child(7) {
+	border-left: 0;
+	border-bottom: 0;
+}
+.game-cell:nth-child(8) {
+	border-bottom: 0;
+}
+.game-cell:nth-child(9) {
+	border-right: 0;
+	border-bottom: 0;
+}
+.X {
+	color: var(--niagara);
+}
+.O {
+	color: var(--corn);
 }
 
 #newGameBtn {
@@ -52,6 +135,24 @@ button {
 button.submit {
 	margin: 0 auto;
 }
+
+.button.secondary,
+.button.secondary.disabled,
+.button.secondary.disabled:focus,
+.button.secondary.disabled:hover,
+.button.secondary[disabled],
+.button.secondary[disabled]:focus,
+.button.secondary[disabled]:hover {
+	background-color: var(--corn);
+	color: black;
+}
+
+.button.secondary:focus,
+.button.secondary:hover {
+	background-color: var(--dark-corn);
+	color: black;
+}
+
 .hidden {
 	display: none;
 }
@@ -62,6 +163,47 @@ button.submit {
 
 .gameOptions {
 	margin-bottom: 15px;
+}
+
+.gameOptions .button-group {
+	margin: 0 auto;
+	width: 50%;
+}
+
+#gameMsg {
+	margin-top: 10px;
+}
+
+/* Sticky Footer */
+body {
+	min-height: 100vh;
+	display: flex;
+	gap: 15px;
+	flex-direction: column;
+}
+.container {
+	flex: 1;
+}
+
+footer {
+	flex-shrink: 0;
+	text-align: center;
+	padding-bottom: 50px;
+}
+
+footer a,
+footer i {
+	cursor: pointer;
+	color: var(--corn);
+}
+footer i {
+	/* color: var(--dark-olive-green); */
+	transition: transform 0.15s ease-in-out;
+}
+
+footer i:hover {
+	/* color: var(--kombu-green); */
+	transform: scale(1.2);
 }
 
 @media screen and (max-width: 640px) {
@@ -84,6 +226,9 @@ button.submit {
 }
 
 @media screen and (min-width: 1024px) {
+	h1 {
+		font-size: 5rem;
+	}
 	.container {
 		width: 70%;
 	}

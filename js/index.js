@@ -90,6 +90,7 @@ const displayController = (() => {
 
 	const mark = (spot, sign) => {
 		const chosen = document.querySelector(`[data-attribute="${spot}"]`);
+		chosen.classList.add(sign);
 		chosen.textContent = sign;
 	};
 
