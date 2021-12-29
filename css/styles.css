@@ -64,6 +64,12 @@ button.submit {
 	margin-bottom: 15px;
 }
 
+@media screen and (max-width: 640px) {
+	.cell.small-0 {
+		display: none;
+	}
+}
+
 @media screen and (min-width: 768px) {
 	.container {
 		width: 80%;

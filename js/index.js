@@ -411,110 +411,7 @@ const offsetDiv = (num) => {
 	return div;
 };
 
-/* AI Bot Form */
-const AIBotBtn = document.getElementById('AIBotBtn');
-AIBotBtn.addEventListener('click', (e) => {
-	displayController.hideGameArea();
-	displayController.removeForm();
-
-	// add form to dom
-	const form = document.createElement('form');
-	const playerOneLabel = document.createElement('label');
-	playerOneLabel.setAttribute('for', 'playerOneName');
-	playerOneLabel.textContent = 'Player 1';
-	const playerOneInput = document.createElement('input');
-	setAttributes(playerOneInput, {
-		type: 'text',
-		id: 'playerOneName',
-		name: 'playerOneName',
-		placeholder: 'Enter Name',
-		autocomplete: 'off',
-		required: '',
-	});
-
-	const swapSign = (e) => {
-		e.preventDefault();
-		if (playerOneSign.textContent == 'X') {
-			playerOneSign.textContent = 'O';
-			AISign.textContent = 'X';
-		} else {
-			playerOneSign.textContent = 'X';
-			AISign.textContent = 'O';
-		}
-	};
-
-	const playerOneSign = document.createElement('button');
-	playerOneSign.textContent = 'X';
-	playerOneSign.addEventListener('click', swapSign);
-
-	const AIDifficultyLabel = document.createElement('label');
-	AIDifficultyLabel.setAttribute('for', 'AI Bot Difficulty');
-	AIDifficultyLabel.textContent = 'AI Bot Difficulty';
-	const AIDifficultySelect = document.createElement('select');
-	setAttributes(AIDifficultySelect, {
-		type: 'select',
-		id: 'AIBot',
-		name: 'AIBot',
-		required: '',
-	});
-
-	const createOptions = (...values) => {
-		values.forEach((value) => {
-			const option = document.createElement('option');
-			option.value = value;
-			option.textContent = value;
-			AIDifficultySelect.appendChild(option);
-		});
-	};
-	createOptions('Easy', 'Medium', 'Hard', 'Impossible');
-
-	const AISign = document.createElement('button');
-	AISign.textContent = 'O';
-	AISign.addEventListener('click', swapSign);
-
-	const submitBtn = document.createElement('input');
-	setAttributes(submitBtn, {
-		type: 'submit',
-		value: 'Submit',
-	});
-
-	submitBtn.addEventListener('click', (e) => {
-		e.preventDefault();
-		// form hides
-		displayController.hideItem('form');
-		displayController.showItem('#gameArea');
-		// game starts and is shown
-		const playerOne = Player(
-			playerOneInput.value || 'Player 1',
-			playerOneSign.textContent
-		);
-		const AI = AIBot(AIDifficultySelect.value, AISign.textContent);
-		game.setPlayers(playerOne, AI);
-		game.setAIGame(true);
-		game.newGame();
-		// destroy form
-		form.remove();
-	});
-
-	appendChildren(
-		form,
-		playerOneLabel,
-		playerOneInput,
-		playerOneSign,
-		br(),
-		AIDifficultyLabel,
-		AIDifficultySelect,
-		AISign,
-		br(),
-		submitBtn
-	);
-
-	document.querySelector('.container').appendChild(form);
-});
-
-/* twoPlayers Form */
-const twoPlayersBtn = document.getElementById('twoPlayersBtn');
-twoPlayersBtn.addEventListener('click', (e) => {
+const createForm = (playerTwoDefaultName = 'Player 2') => {
 	const swapSign = (e) => {
 		e.preventDefault();
 		if (playerOneSign.textContent == 'X') {
@@ -525,7 +422,6 @@ twoPlayersBtn.addEventListener('click', (e) => {
 			playerTwoSign.textContent = 'O';
 		}
 	};
-
 	displayController.hideGameArea();
 	displayController.removeForm();
 
@@ -580,7 +476,7 @@ twoPlayersBtn.addEventListener('click', (e) => {
 	const playerTwoNameLabel = document.createElement('label');
 	playerTwoNameLabel.setAttribute('for', 'playerTwoName');
 	playerTwoNameLabel.classList.add('text-left');
-	playerTwoNameLabel.textContent = 'Player 2';
+	playerTwoNameLabel.textContent = `${playerTwoDefaultName}`;
 	const playerTwoNameInput = document.createElement('input');
 	setAttributes(playerTwoNameInput, {
 		type: 'text',
@@ -592,7 +488,7 @@ twoPlayersBtn.addEventListener('click', (e) => {
 
 	const playerTwoSignLabel = document.createElement('label');
 	playerTwoSignLabel.setAttribute('for', 'playerTwoSign');
-	playerTwoSignLabel.textContent = 'Player 2 Sign';
+	playerTwoSignLabel.textContent = `${playerTwoDefaultName} Sign`;
 
 	const playerTwoSign = document.createElement('button');
 	playerTwoSign.textContent = 'O';
@@ -619,7 +515,7 @@ twoPlayersBtn.addEventListener('click', (e) => {
 			playerOneSign.textContent
 		);
 		const playerTwo = Player(
-			playerTwoNameInput.value || 'Player 2',
+			playerTwoNameInput.value || playerTwoDefaultName,
 			playerTwoSign.textContent
 		);
 		game.setPlayers(playerOne, playerTwo);
@@ -653,6 +549,78 @@ twoPlayersBtn.addEventListener('click', (e) => {
 	gridContainer.appendChild(gridX);
 
 	form.appendChild(gridContainer);
+
+	return form;
+};
+
+/* AI Bot Form */
+const AIBotBtn = document.getElementById('AIBotBtn');
+AIBotBtn.addEventListener('click', (e) => {
+	displayController.hideGameArea();
+	displayController.removeForm();
+
+	// add form to dom
+	const form = createForm('AI Bot');
+	const gridX = form.querySelector('.grid-x');
+
+	const difficultyCell = document.createElement('div');
+	difficultyCell.classList.add('small-12', 'medium-7', 'cell');
+
+	const difficultyLabel = document.createElement('label');
+	difficultyLabel.classList.add('text-left');
+	difficultyLabel.setAttribute('for', 'AI Bot Difficulty');
+	difficultyLabel.textContent = 'AI Bot Difficulty';
+	const difficultySelect = document.createElement('select');
+	setAttributes(difficultySelect, {
+		type: 'select',
+		id: 'AIBot',
+		name: 'AIBot',
+	});
+
+	const createOptions = (...values) => {
+		values.forEach((value) => {
+			const option = document.createElement('option');
+			option.value = value;
+			option.textContent = value;
+			difficultySelect.appendChild(option);
+		});
+	};
+	createOptions('Easy', 'Medium', 'Hard', 'Impossible');
+
+	const submitBtn = form.querySelector('.submit');
+
+	submitBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		const playerOneInput = form.querySelector('#playerOneName');
+		const playerOneSign = form.querySelector('#playerOneSign');
+		const playerTwoSign = form.querySelector('#playerTwoSign');
+
+		displayController.showItem('#gameArea');
+		// game starts and is shown
+		const playerOne = Player(
+			playerOneInput.value || 'Player 1',
+			playerOneSign.textContent
+		);
+		const AI = AIBot(difficultySelect.value, playerTwoSign.textContent);
+		game.setPlayers(playerOne, AI);
+		game.setAIGame(true);
+		game.newGame();
+		// destroy form
+		form.remove();
+	});
+
+	appendChildren(difficultyCell, difficultyLabel, difficultySelect);
+
+	appendChildren(gridX, offsetDiv(3), difficultyCell, offsetDiv(2), submitBtn);
+
+	document.querySelector('.container').appendChild(form);
+});
+
+/* twoPlayers Form */
+const twoPlayersBtn = document.getElementById('twoPlayersBtn');
+
+twoPlayersBtn.addEventListener('click', (e) => {
+	const form = createForm();
 
 	document.querySelector('.container').appendChild(form);
 });
