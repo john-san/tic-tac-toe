@@ -1,3 +1,5 @@
+$(document).foundation();
+
 // gameBoard module
 // has array inside gameboard
 const gameBoard = (() => {
@@ -54,7 +56,7 @@ const displayController = (() => {
 
 		for (let i = 0; i < arr.length; i++) {
 			const cell = document.createElement('div');
-			cell.classList.add('cell');
+			cell.classList.add('game-cell');
 			cell.setAttribute('data-attribute', i);
 
 			cell.addEventListener('click', (e) => {
@@ -403,8 +405,13 @@ const br = () => document.createElement('br');
 const appendChildren = (parentEl, ...childEls) => {
 	childEls.forEach((child) => parentEl.appendChild(child));
 };
+const offsetDiv = (num) => {
+	const div = document.createElement('div');
+	div.classList.add('cell', `medium-${num}`, 'small-0');
+	return div;
+};
 
-/* AIBotBtn */
+/* AI Bot Form */
 const AIBotBtn = document.getElementById('AIBotBtn');
 AIBotBtn.addEventListener('click', (e) => {
 	displayController.hideGameArea();
@@ -435,6 +442,7 @@ AIBotBtn.addEventListener('click', (e) => {
 			AISign.textContent = 'O';
 		}
 	};
+
 	const playerOneSign = document.createElement('button');
 	playerOneSign.textContent = 'X';
 	playerOneSign.addEventListener('click', swapSign);
@@ -504,27 +512,9 @@ AIBotBtn.addEventListener('click', (e) => {
 	document.querySelector('.container').appendChild(form);
 });
 
-/* twoPlayersBtn */
+/* twoPlayers Form */
 const twoPlayersBtn = document.getElementById('twoPlayersBtn');
 twoPlayersBtn.addEventListener('click', (e) => {
-	displayController.hideGameArea();
-	displayController.removeForm();
-
-	// add form to dom
-	const form = document.createElement('form');
-	const playerOneLabel = document.createElement('label');
-	playerOneLabel.setAttribute('for', 'playerOneName');
-	playerOneLabel.textContent = 'Player 1';
-	const playerOneInput = document.createElement('input');
-	setAttributes(playerOneInput, {
-		type: 'text',
-		id: 'playerOneName',
-		name: 'playerOneName',
-		placeholder: 'Enter Name',
-		autocomplete: 'off',
-		required: '',
-	});
-
 	const swapSign = (e) => {
 		e.preventDefault();
 		if (playerOneSign.textContent == 'X') {
@@ -535,32 +525,88 @@ twoPlayersBtn.addEventListener('click', (e) => {
 			playerTwoSign.textContent = 'O';
 		}
 	};
+
+	displayController.hideGameArea();
+	displayController.removeForm();
+
+	// add form to dom
+	const form = document.createElement('form');
+
+	const gridContainer = document.createElement('div');
+	gridContainer.classList.add('grid-container', 'fluid');
+
+	const gridX = document.createElement('div');
+	gridX.classList.add('grid-x');
+
+	const playerOneNameCell = document.createElement('div');
+	playerOneNameCell.classList.add('small-8', 'medium-4', 'cell');
+
+	const playerOneSignCell = document.createElement('div');
+	playerOneSignCell.classList.add('small-4', 'medium-3', 'cell');
+
+	const playerOneNameLabel = document.createElement('label');
+	playerOneNameLabel.setAttribute('for', 'playerOneName');
+	playerOneNameLabel.classList.add('text-left');
+	playerOneNameLabel.textContent = 'Player 1';
+
+	const playerOneNameInput = document.createElement('input');
+	setAttributes(playerOneNameInput, {
+		type: 'text',
+		id: 'playerOneName',
+		name: 'playerOneName',
+		placeholder: 'Enter Name',
+		autocomplete: 'off',
+	});
+
+	const playerOneSignLabel = document.createElement('label');
+	playerOneSignLabel.setAttribute('for', 'playerOneSign');
+	playerOneSignLabel.textContent = 'Player 1 Sign';
+
 	const playerOneSign = document.createElement('button');
 	playerOneSign.textContent = 'X';
+	setAttributes(playerOneSign, {
+		id: 'playerOneSign',
+		type: 'button',
+		class: 'button',
+	});
 	playerOneSign.addEventListener('click', swapSign);
 
-	const playerTwoLabel = document.createElement('label');
-	playerTwoLabel.setAttribute('for', 'playerTwoName');
-	playerTwoLabel.textContent = 'Player 2';
-	const playerTwoInput = document.createElement('input');
-	setAttributes(playerTwoInput, {
+	const playerTwoNameCell = document.createElement('div');
+	playerTwoNameCell.classList.add('small-8', 'medium-4', 'cell');
+
+	const playerTwoSignCell = document.createElement('div');
+	playerTwoSignCell.classList.add('small-4', 'medium-3', 'cell');
+
+	const playerTwoNameLabel = document.createElement('label');
+	playerTwoNameLabel.setAttribute('for', 'playerTwoName');
+	playerTwoNameLabel.classList.add('text-left');
+	playerTwoNameLabel.textContent = 'Player 2';
+	const playerTwoNameInput = document.createElement('input');
+	setAttributes(playerTwoNameInput, {
 		type: 'text',
 		id: 'playerTwoName',
 		name: 'playerTwoName',
 		placeholder: 'Enter Name',
 		autocomplete: 'off',
-		required: '',
 	});
+
+	const playerTwoSignLabel = document.createElement('label');
+	playerTwoSignLabel.setAttribute('for', 'playerTwoSign');
+	playerTwoSignLabel.textContent = 'Player 2 Sign';
 
 	const playerTwoSign = document.createElement('button');
 	playerTwoSign.textContent = 'O';
+	setAttributes(playerTwoSign, {
+		id: 'playerTwoSign',
+		type: 'button',
+		class: 'button',
+	});
+
 	playerTwoSign.addEventListener('click', swapSign);
 
-	const submitBtn = document.createElement('input');
-	setAttributes(submitBtn, {
-		type: 'submit',
-		value: 'Submit',
-	});
+	const submitBtn = document.createElement('button');
+	submitBtn.classList.add('submit', 'success', 'button');
+	submitBtn.textContent = 'Submit';
 
 	submitBtn.addEventListener('click', (e) => {
 		e.preventDefault();
@@ -569,11 +615,11 @@ twoPlayersBtn.addEventListener('click', (e) => {
 		displayController.showItem('#gameArea');
 		// game starts and is shown
 		const playerOne = Player(
-			playerOneInput.value || 'Player 1',
+			playerOneNameInput.value || 'Player 1',
 			playerOneSign.textContent
 		);
 		const playerTwo = Player(
-			playerTwoInput.value || 'Player 2',
+			playerTwoNameInput.value || 'Player 2',
 			playerTwoSign.textContent
 		);
 		game.setPlayers(playerOne, playerTwo);
@@ -583,18 +629,30 @@ twoPlayersBtn.addEventListener('click', (e) => {
 		form.remove();
 	});
 
+	appendChildren(playerOneNameCell, playerOneNameLabel, playerOneNameInput);
+	appendChildren(playerOneSignCell, playerOneSignLabel, playerOneSign);
+
+	appendChildren(playerTwoNameCell, playerTwoNameLabel, playerTwoNameInput);
+	appendChildren(playerTwoSignCell, playerTwoSignLabel, playerTwoSign);
+
 	appendChildren(
-		form,
-		playerOneLabel,
-		playerOneInput,
-		playerOneSign,
+		gridX,
+		offsetDiv(3),
+		playerOneNameCell,
+		playerOneSignCell,
+		offsetDiv(2),
 		br(),
-		playerTwoLabel,
-		playerTwoInput,
-		playerTwoSign,
+		offsetDiv(3),
+		playerTwoNameCell,
+		playerTwoSignCell,
+		offsetDiv(2),
 		br(),
 		submitBtn
 	);
+
+	gridContainer.appendChild(gridX);
+
+	form.appendChild(gridContainer);
 
 	document.querySelector('.container').appendChild(form);
 });
